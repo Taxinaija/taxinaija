@@ -1,0 +1,28 @@
+{
+  "name": "taxinaija",
+  "version": "1.0.0",
+  "description": "Ride-hailing app for Nigeria (drivers & riders)",
+  "main": "src/index.jsx",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No tests specified yet\" && exit 0"
+  },
+  "keywords": [
+    "ride-sharing",
+    "taxi",
+    "nigeria",
+    "react",
+    "firebase"
+  ],
+  "author": "TaxiNaija",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Taxinaija/taxinaija.git"
+  },
+  "dependencies": {
+    "firebase": "^12.5.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}
