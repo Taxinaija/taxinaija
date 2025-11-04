@@ -5,6 +5,7 @@ import {
   signOutUser,
   createRide
 } from '../shared/firebaseService.js';
+import { getBaseFare } from '../shared/fareCalculator.js';
 
 const RiderApp = () => {
   const [user, setUser] = useState(null);
@@ -37,13 +38,21 @@ const RiderApp = () => {
     setLoading(true);
     setMessage('');
 
+    // TODO: Implement proper fare calculation based on distance and time
+    // For now, using a base fare. In production, integrate with:
+    // - Google Maps Distance Matrix API for distance calculation
+    // - Dynamic pricing based on time of day and demand
+    // - Surge pricing during peak hours
+    // See fareCalculator.js for fare calculation utilities
+    const fare = getBaseFare(); // Using base fare until distance calculation is implemented
+
     const result = await createRide({
       riderId: user.uid,
       riderName: userData.name,
       riderPhone: userData.phone,
       pickup: { address: pickup },
       destination: { address: destination },
-      fare: Math.floor(Math.random() * 2000) + 500 // Mock fare calculation
+      fare: fare
     });
 
     if (result.success) {

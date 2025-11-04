@@ -8,10 +8,15 @@ yarn-error.log*
 build/
 dist/
 
-# Environment variables
+# Environment variables (contains sensitive Firebase config)
 .env
 .env.local
 .env.production
+.env.development
+
+# Firebase config with real credentials (if customized)
+# Uncomment the line below if you replace placeholders with real values
+# firebase/firebase.config.js
 
 # IDE
 .vscode/

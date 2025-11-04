@@ -53,7 +53,19 @@ npm install
 2. Scroll to "Your apps" section
 3. Click the web icon (</>) to register your web app
 4. Copy the configuration values
-5. Update `firebase/firebase.config.js` with your values:
+5. **Recommended:** Create a `.env` file (copy from `.env.example`) with your values:
+
+```bash
+# .env file
+FIREBASE_API_KEY=your-api-key
+FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+FIREBASE_APP_ID=your-app-id
+```
+
+**Alternative (for testing only):** Update `firebase/firebase.config.js` directly:
 
 ```javascript
 export const firebaseConfig = {
@@ -65,6 +77,8 @@ export const firebaseConfig = {
   appId: "your-app-id"
 };
 ```
+
+**Security Note:** Never commit real Firebase credentials to version control. Use `.env` file (already in `.gitignore`) for local development.
 
 #### Deploy Firebase Security Rules
 1. Install Firebase CLI:
