@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Helper function to check if user is approved
+    function isApproved() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.approved == true;
+    }
+    
+    // Helper function to check if user is a driver
+    function isDriver() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'driver';
+    }
+    
+    // Helper function to check if user is a rider
+    function isRider() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'rider';
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Allow read if authenticated
+      allow read: if request.auth != null;
+      
+      // Allow create for new users (self-registration)
+      allow create: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow update only by admin or self (but not approval status)
+      allow update: if (request.auth.uid == userId && 
+                       request.resource.data.approved == resource.data.approved) ||
+                       isAdmin();
+    }
+    
+    // Rides collection
+    match /rides/{rideId} {
+      // Allow riders to read their own rides
+      allow read: if request.auth != null && 
+                     (resource.data.riderId == request.auth.uid || 
+                      resource.data.driverId == request.auth.uid ||
+                      isAdmin());
+      
+      // Allow riders to create rides if they are approved
+      allow create: if request.auth != null && 
+                       isRider() && 
+                       isApproved() &&
+                       request.resource.data.riderId == request.auth.uid;
+      
+      // Allow drivers to update rides (accept/complete) if they are approved
+      allow update: if request.auth != null && 
+                       isDriver() && 
+                       isApproved() &&
+                       (request.resource.data.driverId == request.auth.uid ||
+                        resource.data.driverId == request.auth.uid);
+      
+      // Allow riders to update rides (cancel)
+      allow update: if request.auth != null && 
+                       resource.data.riderId == request.auth.uid &&
+                       request.resource.data.status == 'cancelled';
+      
+      // Allow admin to do anything
+      allow write: if isAdmin();
+    }
+    
+    // Driver locations collection (real-time tracking)
+    match /driverLocations/{driverId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+                      request.auth.uid == driverId && 
+                      isDriver() && 
+                      isApproved();
+    }
+  }
+}
